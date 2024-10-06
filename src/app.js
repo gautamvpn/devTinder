@@ -1,4 +1,5 @@
 const express = require('express');
+const {adminAuth,UserAuth} = require('./Middlewares/auth')
 
 // creating an instance of an express application
 const app = express();
@@ -12,30 +13,27 @@ const app = express();
 
 // })
 
+app.use("/admin",adminAuth)
 
-app.use("/user", (req, res, next) => {
 
-    // Route handler...
-    console.log("Handling the route handler..")
-    // res.send("Response...")
-    next()
-},
-    (req, res, next) => {
-        console.log("Handling the route handler 2nd..")
-        // res.send("Response 2nd...")
-        next()
-    },
-    (req, res, next) => {
-        console.log("Handling the route handler 3nd..")
-        // res.send("Response 3nd...");
-        next()
-    },
-    (req, res, next) => {
-        console.log("Handling the route handler 4nd..")
-        // res.send("Response 4nd...")
-        next()
-    }
-)
+app.use("/user/login",(req,res)=>{
+    res.send("User is logined.....")
+})
+
+app.use("/user",UserAuth,(req,res)=>{
+    res.send("User is getting checked....")
+})
+
+app.use("/admin/getAllData",(req,res)=>{
+
+    res.send("Getting Admin Data....")
+})
+
+
+
+app.use("/admin/deleteUser",(req,res)=>{
+    res.send("Delete a User....")
+})
 
 
 
