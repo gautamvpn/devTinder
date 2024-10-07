@@ -31,3 +31,15 @@
 - Differences app.use and ap.all
 - Write a dummy wuth middlewares for admins
 - Write a dummy auth middlewares for all the user routes, except /user/login
+- Error handling using -> app.use('/',(err,req,res,next) ={})
+- Create a free cluster on mondoDB official websites (Mongo Atlas)
+- Install mongoose library
+- Connect your application to the Databse Connection-url"/devTinder
+- Call the connection function and connect to the databasebefore starting application on 7777.
+- Create a userScema
+- Create /signup API to add data to database
+- push some documents using POST  API calls from postman
+
+- Difference between javscript object and json
+- Add the express.json() middlewares to your app.
+- Make your signup API dynamic to recieve data from the end user
