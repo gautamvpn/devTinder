@@ -61,6 +61,7 @@
 -Data Sanitizations - Add API validations for each field
 -Install validator npm package
 -Explore validator library functions and Use validator funcs for passowrd,emailID
+-NEVER TRUST req.body -----> need data sanitizations
 
 
 
