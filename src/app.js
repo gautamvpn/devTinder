@@ -3,126 +3,125 @@ const express = require('express');
 const app = express();
 
 const User = require("./models/user")
-
-const  DBConnection  = require("./config/database")
+const { validateSignUp } = require("./utils/validation")
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
+const DBConnection = require("./config/database")
+const { UserAuth } = require('./Middlewares/auth')
 
 
 // middlewares provided by express to read the json data into objects
 app.use(express.json())
+app.use(cookieParser())
 
-app.post("/signup",async(req,res)=>{
+
+app.post("/signup", async (req, res) => {
 
     console.log(req.body);
 
-    // creating a new instance of user model and passing dynamic data that's comes throgh the api.
-    const user = new User(req.body)
 
-    try{
-        // user data will save into database
+
+    try {
+        //validation of data..
+        validateSignUp(req);
+
+        const { firstName, lastName, emailId, password } = req.body;
+        // console.log(password)
+
+        //Encrypt the password
+        const hashPassword = await bcrypt.hash(password, 10);
+        // console.log(hashPassword)
+
+
+        // creating a new instance of user model and passing dynamic data that's comes throgh the api.
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password: hashPassword
+        })
+
+        // user data will save into database 
         await user.save();
         res.send("data successfully saved...")
     }
-    catch(err){
-        res.status(400).send("Something went wrong on saving the data...."+err)
+    catch (err) {
+        res.status(400).send("Something went wrong on saving the data at signUp...." + err.message)
     }
 
 })
 
-// get user by emailId....
-app.get("/user",async (req,res)=>{
+// for login
+app.post("/login", async (req, res) => {
 
-    try{
-        const emailID = req.body.emailId;
-        const users = await User.find({emailId:emailID});
-        console.log("****",users)
-        if(users.length === 0)
-        {
-            res.status(400).send("User not found....")
+    try {
+
+        const { emailId, password } = req.body;
+
+        const user = await User.findOne({ emailId: emailId })
+
+        if (user.length == 0) {
+            throw new Error("Invalid credentials..")
         }
-        else{
-            res.send(users);
+
+        // console.log(password,"***",user.password)
+
+        // const isPasswordValid =  bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password)
+
+        if (isPasswordValid) {
+
+            //Create a JWT Token...
+            // const token = await jwt.sign({ _id: user._id }, 'DEV@Tinder$123',{expiresIn:'7d'})
+
+            const token = await user.getJWT()
+            console.log(token);
+
+            //Add the token to cookie and send the response back to the user..
+
+            res.cookie('token', token)
+
+
+            res.send("Login successfully...")
         }
+        else {
+            throw new Error("password is not valid...")
+        }
+
     }
-    catch(err)
-    {
+    catch (err) {
+        res.status(400).send("Something went wrong on saving the data at logIn...." + err.message)
+    }
+})
+
+// get profile
+app.get('/profile', UserAuth, async (req, res) => {
+
+    try {
+
+        const user = req.user;
+        //   console.log(cookies," ",token)
+        res.send(user)
+
+    } catch (err) {
         res.status(400).send("User fetching records failed")
     }
-
 })
 
-// getting all the user from the database
-app.get("/feed", async (req,res)=>{
+
+app.post('/sentConnectionRequest',UserAuth,(req,res)=>{
     try{
-        // just give empty object inside find methods, it return all documents 
-        const users = await User.find({});
-        res.send(users);
+
+        const user = req.user;
+        res.send( user.firstName +" sent the connections....")
     }
     catch(err)
     {
-        res.status(400).send("Users fetching records failed...")
+        res.status(400).send("Connection failed..")
     }
 })
 
-
-// deleting the data from the database...
-app.delete("/user",async(req,res)=>{
-    const userId = req.body.userID;
-
-    try{
-        await User.findByIdAndDelete(userId)
-        res.send("User deleted successfuly....")
-    } catch(err)
-    {
-        res.status(400).send("something went wrong.....")
-    }
-
-})
-
-
-// Update data of the user
-app.patch("/user/:userId",async(req,res)=>{
-
-    // const userId = req.body.userId;
-    const userId = req.params.userId;
-    const data = req.body;
-
-   
-
-    console.log("***",userId)
-
-    try{
-
-
-        const ALLOWED_UPDATES = [
-           "photoUrl","about","gender","age","skills"
-        ]
-    
-        const isUpdateAllowed = Object.keys(data).every((k)=>
-          ALLOWED_UPDATES.includes(k)    
-        )
-    
-        if(!isUpdateAllowed)
-        {
-            throw new Error("Update not allowed...");
-        }
-
-        if(data?.skills.length > 10)
-        {
-            throw new Error("skills cannot be more than 10.")
-        }
-
-       const user =  await User.findByIdAndUpdate(userId,data,{
-        runValidators:true
-       });
-        res.send("updated successfully...")
-    }
-
-    catch(err)
-    {
-        res.status(400).send("Update failed..."+err)
-    }
-
-})
 
 
 
@@ -139,4 +138,3 @@ DBConnection().then(() => {
 })
 
 
- 
