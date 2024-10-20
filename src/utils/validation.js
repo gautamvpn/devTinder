@@ -26,6 +26,24 @@ const validateSignUp = (req) => {
 
 }
 
+const validateUpdateData = (req) =>{
+
+   const {photoUrl} = req.body;
+   const updateKeys = ["email","age","gender","photoUrl","about","skills"];
+
+  if(!validator.isURL(photoUrl))
+  {
+    throw new Error("photoUrl is not valid........"+photoUrl)
+  }
+
+  isValidData = Object.keys(req.body).every(item => updateKeys.includes(item));
+
+  console.log("**check condition from validation***",isValidData)
+  return isValidData;
+
+}
+
 module.exports = {
-    validateSignUp
+    validateSignUp,
+    validateUpdateData
 }

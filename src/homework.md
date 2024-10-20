@@ -82,6 +82,18 @@
 -Create UserSchema method to comparepassword(passwordInputByUser)
 
 
+-Explore tinder APIs
+-Create a List all APi you can think of in DEV Tinder
+-Group multiple routes under respective routers
+-Read documentation for express.Router
+-Create routes folder for managing auth, profile, request routers
+-Create authrouter, profileRouter, requestRouter
+-Import these router in app.js
+-Create POST /logout API
+-Create PATCH /profile/edit
+-Create PATCH /profile/password API  => forgot password API
+-Make you validate all data in every POST,PATCH api's
+
 
 
 
