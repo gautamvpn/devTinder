@@ -108,4 +108,19 @@
 - Always think about cornor cases
 
 
+-Write code with proper validations for POST /request/review/:status/:requestId
+-Thought process - POST vs GET
+- Read about ref and populate - https://mongoosejs.com/docs/populate.html
+- Create GET /user/request/received with all checks
+- Create GET GET/user/connections 
+
+-Logic for GET /feed API
+-Explore the $nin, $ne, and other query operators
+-Paginations
+
+/feed?page
+
+
+
+
 

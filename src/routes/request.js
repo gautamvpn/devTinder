@@ -45,7 +45,7 @@ requestRouter.post('/request/send/:status/:toUserId',
 
 
 
-
+     // creating a new instance of connectionRequest...
         const connectionReq = new connectionRequest({
             fromUserId,
             toUserId,
@@ -58,6 +58,44 @@ requestRouter.post('/request/send/:status/:toUserId',
            message:  req.user.firstName+" is "+ status + " in "+ user.firstName,
            "Data":data
        })
+    }
+    catch(err)
+    {
+        res.status(400).send("send connection failed.."+ err.message)
+    }
+})
+
+requestRouter.post('/request/review/:status/:requestId', UserAuth, async(req,res)=>{
+    
+    try{
+        const loggedUser = req.user;
+        const {requestId,status} = req.params
+        console.log(loggedUser._id,"**",requestId,"**",status)
+
+        const allowedStatus = ["accepted","rejected"];
+        if(!allowedStatus.includes(status))
+        {
+        return res.status(400).json({message:"status now allowed.."})
+        }
+
+
+        const connectionReq = await connectionRequest.findOne({
+            _id:requestId,
+            toUserId:loggedUser._id,
+            status:"interested",
+        })
+
+        if(!connectionReq)
+        {
+            return res.json({mesasge:"connection request not found..."})
+        }
+
+        // console.log("***",connectionReq )
+        connectionReq.status = status;
+        const data = await connectionReq.save()
+        res.json({message:"connection requested "+ status, data
+        })
+
     }
     catch(err)
     {
