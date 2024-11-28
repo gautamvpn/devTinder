@@ -17,7 +17,7 @@ authRouter.post("/signup", async (req, res) => {
         //validation of data..
         validateSignUp(req);
 
-        const { firstName, lastName, emailId, password,photoUrl,about,skills } = req.body;
+        const { firstName, lastName, emailId,age,gender, password,photoUrl,about,skills } = req.body;
         // console.log(password)
 
         //Encrypt the password
@@ -30,6 +30,8 @@ authRouter.post("/signup", async (req, res) => {
             firstName,
             lastName,
             emailId,
+            age,
+            gender,
             password: hashPassword,
             photoUrl,
             about,
@@ -37,8 +39,14 @@ authRouter.post("/signup", async (req, res) => {
         })
 
         // user data will save into database 
-        await user.save();
-        res.send("data successfully saved...")
+        const savedUser = await user.save();
+        const token = await savedUser.getJWT()
+        // console.log(token);
+
+        res.cookie('token', token,
+        { expires: new Date(Date.now() + 900000)})
+
+        res.json({ message:"User added successfully",data:savedUser})
     }
     catch (err) {
         res.status(400).send("Something went wrong on saving the data at signUp...." + err.message)
@@ -78,7 +86,7 @@ authRouter.post("/login", async (req, res) => {
             res.cookie('token', token,{ expires: new Date(Date.now() + 900000)})
 
 
-            res.send("Login successfully...")
+            res.send(user)
         }
         else {
             throw new Error("password is not valid...")
@@ -86,7 +94,7 @@ authRouter.post("/login", async (req, res) => {
 
     }
     catch (err) {
-        res.status(400).send("Something went wrong on saving the data at logIn...." + err.message)
+        res.status(400).send("Error: " + err.message)
     }
 })
 

@@ -21,6 +21,7 @@ profileRouter.get('/profile/view', UserAuth, async (req, res) => {
 profileRouter.patch('/profile/edit', UserAuth, async(req,res)=>{
 
     const checkValidation = validateUpdateData(req);
+    console.log(checkValidation)
     try{
         if(!checkValidation )
         {
@@ -40,6 +41,9 @@ profileRouter.patch('/profile/edit', UserAuth, async(req,res)=>{
         
         console.log('**after',loggedInUser)
         // newUpdatedData = Object.keys(req.body).every(item => item = user);
+
+        // saving into database
+        await loggedInUser.save();
     
         res.json({ "message" : `${loggedInUser.firstName},  your profile updated successfully..`,
             "data":loggedInUser

@@ -26,22 +26,34 @@ const validateSignUp = (req) => {
 
 }
 
-const validateUpdateData = (req) =>{
 
-   const {photoUrl} = req.body;
-   const updateKeys = ["email","age","gender","photoUrl","about","skills"];
+const validateUpdateData = (req) => {
 
-  if(!validator.isURL(photoUrl))
-  {
-    throw new Error("photoUrl is not valid........"+photoUrl)
-  }
+    const photoUrl = req.body;
 
-  isValidData = Object.keys(req.body).every(item => updateKeys.includes(item));
+    const allowedEditFields = [
+      "firstName",
+      "lastName",
+      "emailId",
+      "photoUrl",
+      "gender",
+      "age",
+      "about",
+      "skills",
+    ];
 
-  console.log("**check condition from validation***",isValidData)
-  return isValidData;
-
-}
+    
+//   if(!validator.isURL(photoUrl))
+//     {
+//       throw new Error("photoUrl is not valid........"+photoUrl)
+//     }
+  
+    const isEditAllowed = Object.keys(req.body).every((field) =>
+      allowedEditFields.includes(field)
+    );
+  
+    return isEditAllowed;
+  };
 
 module.exports = {
     validateSignUp,

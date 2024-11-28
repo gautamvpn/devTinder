@@ -71,7 +71,7 @@ userRouter.get('/user/connections', UserAuth, async(req,res)=>{
 
 // Gets you the profile of other users 
 // can't see himself and sent connections, received connections, already been connections matched
-userRouter.get('/user/feed', UserAuth, async(req,res)=>{
+userRouter.get('/feed', UserAuth, async(req,res)=>{
     try{
         const loggedUser = req.user;
 
